@@ -15,7 +15,7 @@ fn main() {
 
     println!("Version: {}", get_version(&fsuipc));
 
-    // exit(0);
+    thread::sleep(time::Duration::from_secs(2));
 
     loop {
         let mut lat_raw = 0_u64;
