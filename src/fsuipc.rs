@@ -8,12 +8,12 @@ include!("../libfsuipc/libuipc.rs");
 
 pub struct Fsuipc<'a> {
     errMsg: [&'a str; 16],
-    ipc: FSUIPC_IPCUser
+    ipc: FSUIPC_IPCUser,
 }
 
 impl Fsuipc<'_> {
     pub fn new() -> Self {
-        let ipc = FSUIPC_IPCUser{
+        let ipc = FSUIPC_IPCUser {
             Version: 0,
             FSVersion: 0,
             LibVersion: 2002,
@@ -23,7 +23,9 @@ impl Fsuipc<'_> {
             mapHandle: std::ptr::null_mut(),
             viewPointer: std::ptr::null_mut(),
             nextPointer: std::ptr::null_mut(),
-            destinations: std_vector{ _Mypair: std::ptr::null_mut() }
+            destinations: std_vector {
+                _Mypair: std::ptr::null_mut(),
+            },
         };
         Fsuipc {
             errMsg: [
@@ -44,13 +46,16 @@ impl Fsuipc<'_> {
                 "Maybe running on WideClient, but FS not running on Server, or wrong FSUIPC",
                 "Read or Write request cannot be added, memory for Process is full",
             ],
-            ipc
+            ipc,
         }
     }
-    
+
     pub fn connect(&mut self) -> Result<(), (u32, String)> {
         let mut result: FSUIPC_Error = 0;
-        let return_value = unsafe { self.ipc.Open(FSUIPC_Simulator_ANY, &mut result as *mut FSUIPC_Error) };
+        let return_value = unsafe {
+            self.ipc
+                .Open(FSUIPC_Simulator_ANY, &mut result as *mut FSUIPC_Error)
+        };
         if return_value {
             println!("Connected");
             Ok(())
@@ -62,7 +67,15 @@ impl Fsuipc<'_> {
     pub fn read<T: Sized>(&mut self, offset: u16, value: &mut T) -> Result<(), (u32, String)> {
         let mut result: FSUIPC_Error = 0;
         // let size: DWORD = (size_of(value)).into() * 8;
-        let return_value = unsafe { self.ipc.ReadCommon(false, offset as DWORD, size_of::<T>() as DWORD, value as *mut T as *mut std::os::raw::c_void, &mut result as *mut FSUIPC_Error) };
+        let return_value = unsafe {
+            self.ipc.ReadCommon(
+                false,
+                offset as DWORD,
+                size_of::<T>() as DWORD,
+                value as *mut T as *mut std::os::raw::c_void,
+                &mut result as *mut FSUIPC_Error,
+            )
+        };
         if return_value {
             Ok(())
         } else {

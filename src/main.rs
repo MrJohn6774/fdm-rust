@@ -40,7 +40,7 @@ fn main() {
 
         let lat = lat_raw as f64 * (90.0 / (10001750.0 * 65536.0 * 65536.0));
         let lng = lng_raw as f64 * (360.0 / (65536_f64.powf(4.0)));
-        let gs = gs_raw as f64 / 65536.0 * 1.943844;  // converting m/s to knots
+        let gs = gs_raw as f64 / 65536.0 * 1.943844; // converting m/s to knots
         let tas = tas_raw as f64 / 128.0;
         let ias = ias_raw as f64 / 128.0;
         let alt = if si_unit != 2 {
@@ -49,8 +49,8 @@ fn main() {
             // converting meters to feet
             alt_raw as f64 * 3.28084
         };
-        let hgt = hgt_raw as f64 * 3.28084;  // converting meters to feet
-        let ground_elevation = ground_elevation_raw as f64 * 3.28084 / 256.0;  // converting meters to feet
+        let hgt = hgt_raw as f64 * 3.28084; // converting meters to feet
+        let ground_elevation = ground_elevation_raw as f64 * 3.28084 / 256.0; // converting meters to feet
 
         execute!(
             io::stdout(),
@@ -59,9 +59,15 @@ fn main() {
         )
         .unwrap();
 
-        println!("Latitude: {}, Longitude: {} | UNIT: {} (2 = metric)", lat, lng, si_unit);
+        println!(
+            "Latitude: {}, Longitude: {} | UNIT: {} (2 = metric)",
+            lat, lng, si_unit
+        );
         println!("GS: {} knot | TAS: {} knot | IAS: {} knot", gs, tas, ias);
-        println!("Baro: {} ft | Altitude: {} MSL | Ground: {} MSL", alt, hgt, ground_elevation);
+        println!(
+            "Baro: {} ft | Altitude: {} MSL | Ground: {} MSL",
+            alt, hgt, ground_elevation
+        );
 
         thread::sleep(time::Duration::from_millis(500));
     }
@@ -72,7 +78,8 @@ fn get_version(fsuipc: &mut Fsuipc<'_>) -> String {
     fsuipc.read(0x3304, &mut fsuipc_ver).unwrap();
     fsuipc.process().unwrap();
 
-    format!("{:x}.{:x}.{:x}{:x}",
+    format!(
+        "{:x}.{:x}.{:x}{:x}",
         (0x0f & (fsuipc_ver >> 28)),
         (0x0f & (fsuipc_ver >> 24)),
         (0x0f & (fsuipc_ver >> 20)),
