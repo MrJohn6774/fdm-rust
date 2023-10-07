@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "fsuipc-in-rust"
+name = "fsuipc-wrapper"
 version = "0.1.0"
 dependencies = [
  "crossterm",
