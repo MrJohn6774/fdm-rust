@@ -4,7 +4,7 @@
 
 use std::mem::size_of;
 
-include!("../libfsuipc/libuipc.rs");
+include!("../libuipc/libuipc.rs");
 
 pub struct Fsuipc<'a> {
     errMsg: [&'a str; 16],
