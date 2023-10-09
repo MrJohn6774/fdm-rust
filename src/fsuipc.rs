@@ -104,13 +104,13 @@ impl Fsuipc {
 
     pub fn close(&mut self) {
         println!("Closing connection");
+        self.is_connected = false;
         unsafe { self.ipc.Close() };
     }
 }
 
 impl Drop for Fsuipc {
     fn drop(&mut self) {
-        println!("Closing connection");
-        unsafe { self.ipc.Close() };
+        self.close();
     }
 }
