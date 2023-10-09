@@ -57,7 +57,7 @@ impl FlightData {
     pub fn new() -> Self {
         let fsuipc = Fsuipc::new();
 
-        let mut flight_data = FlightData {
+        let flight_data = FlightData {
             fsuipc,
             position: Position {
                 latitude: 0.0,
@@ -74,14 +74,10 @@ impl FlightData {
             raw_data: RawData::new(),
         };
 
-        if flight_data.fsuipc.is_connected {
-            flight_data.update();
-        }
-
         flight_data
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self) -> Result<(), (u32, String)> {
         self.fsuipc.connect().unwrap();
         self.fsuipc
             .read(self.raw_data.lat.0, &mut self.raw_data.lat.1)
@@ -130,5 +126,7 @@ impl FlightData {
         };
         self.altitude = self.raw_data.alt.1 as f64 * 3.28084;
         self.ground_elevation = self.raw_data.ground_elevation.1 as f64 * 3.28084 / 256.0;
+
+        Ok(())
     }
 }
