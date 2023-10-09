@@ -6,7 +6,9 @@ use std::mem::size_of;
 
 include!("../libuipc/libuipc.rs");
 
+#[repr(C)]
 pub struct Fsuipc<'a> {
+    pub is_connected: bool,
     errMsg: [&'a str; 16],
     ipc: FSUIPC_IPCUser,
 }
@@ -28,6 +30,7 @@ impl Fsuipc<'_> {
             },
         };
         Fsuipc {
+            is_connected: false,
             errMsg: [
                 "Okay",
                 "Attempt to Open when already Open",
@@ -56,10 +59,12 @@ impl Fsuipc<'_> {
             self.ipc
                 .Open(FSUIPC_Simulator_ANY, &mut result as *mut FSUIPC_Error)
         };
-        if return_value {
+        if return_value || result == 1 {
             println!("Connected");
+            self.is_connected = true;
             Ok(())
         } else {
+            self.is_connected = false;
             Err((result, self.errMsg[result as usize].to_string()))
         }
     }
@@ -79,6 +84,7 @@ impl Fsuipc<'_> {
         if return_value {
             Ok(())
         } else {
+            self.is_connected = false;
             Err((result, self.errMsg[result as usize].to_string()))
         }
     }
@@ -89,6 +95,7 @@ impl Fsuipc<'_> {
         if return_value {
             Ok(())
         } else {
+            self.is_connected = false;
             Err((result, self.errMsg[result as usize].to_string()))
         }
     }

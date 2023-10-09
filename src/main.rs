@@ -2,12 +2,15 @@ use crossterm::{
     execute,
     terminal::{self, ClearType},
 };
-use std::io;
+use std::{
+    io,
+    time::{Duration, Instant},
+};
 use std::{thread, time};
 
-pub mod fsuipc;
+use fsuipc::Fsuipc;
 
-use crate::fsuipc::Fsuipc;
+pub mod fsuipc;
 
 fn main() {
     let mut fsuipc = Fsuipc::new();
@@ -18,6 +21,8 @@ fn main() {
     thread::sleep(time::Duration::from_secs(2));
 
     loop {
+        let start = Instant::now();
+
         let mut lat_raw = 0_i64;
         let mut lng_raw = 0_i64;
         let mut gs_raw = 0_i32;
@@ -59,14 +64,15 @@ fn main() {
         let ground_elevation = ground_elevation_raw as f64 * 3.28084 / 256.0; // converting meters to feet
 
         let afc_livery = get_string_from_bytes(&afc_livery_raw)
-            .expect("Failed to convert ATC airline name to UTF-8");  // Trim null bytes and convert to String
-    
+            .expect("Failed to convert ATC airline name to UTF-8");
+
         let afc_type = get_string_from_bytes(&afc_type_raw)
             .expect("Failed to convert ATC aircraft type to UTF-8");
-    
+
         let afc_title = get_string_from_bytes(&afc_title_raw)
-        .expect("Failed to convert aircraft name to UTF-8");
-    
+            .expect("Failed to convert aircraft name to UTF-8");
+
+        let elapsed = start.elapsed();
 
         execute!(
             io::stdout(),
@@ -88,8 +94,11 @@ fn main() {
             "0x3D00: {} | 0x3160: {} | 0x3148: {}",
             afc_title, afc_type, afc_livery
         );
+        println!("Lapsed time: {:?}", elapsed);
 
-        thread::sleep(time::Duration::from_millis(500));
+        if elapsed < Duration::new(0, 10_000_000) {
+            thread::sleep(Duration::new(1, 10_000_000) - elapsed);
+        }
     }
 }
 
