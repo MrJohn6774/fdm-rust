@@ -6,14 +6,15 @@ use std::mem::size_of;
 
 include!("../libuipc/libuipc.rs");
 
+#[derive(Debug)]
 #[repr(C)]
-pub struct Fsuipc<'a> {
+pub struct Fsuipc {
     pub is_connected: bool,
-    errMsg: [&'a str; 16],
+    errMsg: [String; 16],
     ipc: FSUIPC_IPCUser,
 }
 
-impl Fsuipc<'_> {
+impl Fsuipc {
     pub fn new() -> Self {
         let ipc = FSUIPC_IPCUser {
             Version: 0,
@@ -32,22 +33,23 @@ impl Fsuipc<'_> {
         Fsuipc {
             is_connected: false,
             errMsg: [
-                "Okay",
-                "Attempt to Open when already Open",
-                "Cannot link to FSUIPC or WideClient",
-                "Failed to Register common message with Windows",
-                "Failed to create Atom for mapping filename",
-                "Failed to create a file mapping object",
-                "Failed to open a view to the file map",
-                "Incorrect version of FSUIPC, or not FSUIPC",
-                "Sim is not version requested",
-                "Call cannot execute, link not Open",
-                "Call cannot execute: no requests accumulated",
-                "IPC timed out all retries",
-                "IPC sendmessage failed all retries",
-                "IPC request contains bad data",
-                "Maybe running on WideClient, but FS not running on Server, or wrong FSUIPC",
-                "Read or Write request cannot be added, memory for Process is full",
+                "Okay".to_owned(),
+                "Attempt to Open when already Open".to_owned(),
+                "Cannot link to FSUIPC or WideClient".to_owned(),
+                "Failed to Register common message with Windows".to_owned(),
+                "Failed to create Atom for mapping filename".to_owned(),
+                "Failed to create a file mapping object".to_owned(),
+                "Failed to open a view to the file map".to_owned(),
+                "Incorrect version of FSUIPC, or not FSUIPC".to_owned(),
+                "Sim is not version requested".to_owned(),
+                "Call cannot execute, link not Open".to_owned(),
+                "Call cannot execute: no requests accumulated".to_owned(),
+                "IPC timed out all retries".to_owned(),
+                "IPC sendmessage failed all retries".to_owned(),
+                "IPC request contains bad data".to_owned(),
+                "Maybe running on WideClient, but FS not running on Server, or wrong FSUIPC"
+                    .to_owned(),
+                "Read or Write request cannot be added, memory for Process is full".to_owned(),
             ],
             ipc,
         }
@@ -99,9 +101,14 @@ impl Fsuipc<'_> {
             Err((result, self.errMsg[result as usize].to_string()))
         }
     }
+
+    pub fn close(&mut self) {
+        println!("Closing connection");
+        unsafe { self.ipc.Close() };
+    }
 }
 
-impl Drop for Fsuipc<'_> {
+impl Drop for Fsuipc {
     fn drop(&mut self) {
         println!("Closing connection");
         unsafe { self.ipc.Close() };
