@@ -103,9 +103,11 @@ impl Fsuipc {
     }
 
     pub fn close(&mut self) {
-        println!("Closing connection");
-        self.is_connected = false;
-        unsafe { self.ipc.Close() };
+        if self.is_connected {
+            unsafe { self.ipc.Close() };
+            println!("Closed connection");
+            self.is_connected = false;
+        }
     }
 }
 

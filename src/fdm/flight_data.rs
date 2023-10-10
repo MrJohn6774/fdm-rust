@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use crate::fsuipc::Fsuipc;
 
 #[derive(Debug)]
@@ -44,7 +46,7 @@ pub struct Speed {
 
 #[derive(Debug)]
 pub struct FlightData {
-    pub fsuipc: Fsuipc,
+    pub fsuipc: Rc<RefCell<Fsuipc>>,
     pub position: Position,
     pub speed: Speed,
     pub baro: f64,
@@ -55,7 +57,8 @@ pub struct FlightData {
 
 impl FlightData {
     pub fn new() -> Self {
-        let fsuipc = Fsuipc::new();
+        let fsuipc = Rc::new(RefCell::new(Fsuipc::new()));
+        fsuipc.borrow_mut().connect().unwrap();
 
         let flight_data = FlightData {
             fsuipc,
@@ -78,39 +81,39 @@ impl FlightData {
     }
 
     pub fn update(&mut self) -> Result<(), (u32, String)> {
-        self.fsuipc.connect().unwrap();
-        self.fsuipc
+        let fsuipc_clone = Rc::clone(&self.fsuipc);
+        let mut fsuipc = fsuipc_clone.borrow_mut();
+        fsuipc
             .read(self.raw_data.lat.0, &mut self.raw_data.lat.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.lng.0, &mut self.raw_data.lng.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.gs.0, &mut self.raw_data.gs.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.tas.0, &mut self.raw_data.tas.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.ias.0, &mut self.raw_data.ias.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.baro.0, &mut self.raw_data.baro.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.alt.0, &mut self.raw_data.alt.1)
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(
                 self.raw_data.ground_elevation.0,
                 &mut self.raw_data.ground_elevation.1,
             )
             .unwrap();
-        self.fsuipc
+        fsuipc
             .read(self.raw_data.si_unit.0, &mut self.raw_data.si_unit.1)
             .unwrap();
-        self.fsuipc.process().unwrap();
-        self.fsuipc.close();
+        fsuipc.process().unwrap();
 
         self.position.latitude =
             self.raw_data.lat.1 as f64 * (90.0 / (10001750.0 * 65536.0 * 65536.0));

@@ -12,7 +12,7 @@ impl FlightDataMonitoring {
     }
 
     pub fn update_data(&mut self) {
-        self.data.update();
+        self.data.update().unwrap();
     }
 }
 
