@@ -1,11 +1,13 @@
 use std::{
-    io, thread,
+    io::{self, Write},
+    thread,
     time::{Duration, Instant},
 };
 
 use crossterm::{
-    execute,
+    cursor, execute,
     terminal::{self, ClearType},
+    ExecutableCommand,
 };
 
 use super::flight_data::FlightData;
@@ -26,17 +28,13 @@ impl FlightDataMonitoring {
     }
 
     pub fn run(&mut self) {
+        execute!(io::stdout(), terminal::Clear(ClearType::All)).unwrap();
         loop {
             let now = Instant::now();
             self.update_data();
             let elapsed = now.elapsed();
 
-            execute!(
-                io::stdout(),
-                terminal::Clear(ClearType::All),
-                crossterm::cursor::MoveTo(0, 0)
-            )
-            .unwrap();
+            io::stdout().execute(cursor::MoveTo(0, 0)).unwrap();
 
             println!(
                 "Latitude: {}, Longitude: {}",
@@ -52,7 +50,9 @@ impl FlightDataMonitoring {
             );
             println!("Elapsed: {:?}", elapsed);
 
-            thread::sleep(Duration::new(0, 8_000_000));
+            io::stdout().flush().unwrap();
+
+            thread::sleep(Duration::new(0, 100_000_000));
         }
     }
 }
