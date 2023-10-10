@@ -2,7 +2,7 @@ use crossterm::{
     execute,
     terminal::{self, ClearType},
 };
-use std::{io, time::Duration};
+use std::{io, time::{Duration, Instant}};
 use std::{thread, time};
 
 use fdm::fdm::FlightDataMonitoring;
@@ -25,7 +25,9 @@ fn main() {
     let mut fdm = FlightDataMonitoring::new();
 
     loop {
+        let now = Instant::now();
         fdm.update_data();
+        let elapsed = now.elapsed();
 
         execute!(
             io::stdout(),
@@ -46,6 +48,7 @@ fn main() {
             "Baro: {} ft | Altitude: {} MSL | Ground: {} MSL",
             fdm.data.baro, fdm.data.altitude, fdm.data.ground_elevation
         );
+        println!("Elapsed: {:?}", elapsed);
 
         thread::sleep(Duration::new(0, 8_000_000));
     }
