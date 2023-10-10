@@ -83,37 +83,19 @@ impl FlightData {
     pub fn update(&mut self) -> Result<(), (u32, String)> {
         let fsuipc_clone = Rc::clone(&self.fsuipc);
         let mut fsuipc = fsuipc_clone.borrow_mut();
-        fsuipc
-            .read(self.raw_data.lat.0, &mut self.raw_data.lat.1)
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.lng.0, &mut self.raw_data.lng.1)
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.gs.0, &mut self.raw_data.gs.1)
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.tas.0, &mut self.raw_data.tas.1)
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.ias.0, &mut self.raw_data.ias.1)
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.baro.0, &mut self.raw_data.baro.1)
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.alt.0, &mut self.raw_data.alt.1)
-            .unwrap();
-        fsuipc
-            .read(
-                self.raw_data.ground_elevation.0,
-                &mut self.raw_data.ground_elevation.1,
-            )
-            .unwrap();
-        fsuipc
-            .read(self.raw_data.si_unit.0, &mut self.raw_data.si_unit.1)
-            .unwrap();
-        fsuipc.process().unwrap();
+        fsuipc.read(self.raw_data.lat.0, &mut self.raw_data.lat.1)?;
+        fsuipc.read(self.raw_data.lng.0, &mut self.raw_data.lng.1)?;
+        fsuipc.read(self.raw_data.gs.0, &mut self.raw_data.gs.1)?;
+        fsuipc.read(self.raw_data.tas.0, &mut self.raw_data.tas.1)?;
+        fsuipc.read(self.raw_data.ias.0, &mut self.raw_data.ias.1)?;
+        fsuipc.read(self.raw_data.baro.0, &mut self.raw_data.baro.1)?;
+        fsuipc.read(self.raw_data.alt.0, &mut self.raw_data.alt.1)?;
+        fsuipc.read(
+            self.raw_data.ground_elevation.0,
+            &mut self.raw_data.ground_elevation.1,
+        )?;
+        fsuipc.read(self.raw_data.si_unit.0, &mut self.raw_data.si_unit.1)?;
+        fsuipc.process()?;
 
         self.position.latitude =
             self.raw_data.lat.1 as f64 * (90.0 / (10001750.0 * 65536.0 * 65536.0));

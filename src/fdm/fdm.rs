@@ -23,15 +23,16 @@ impl FlightDataMonitoring {
         FlightDataMonitoring { data }
     }
 
-    pub fn update_data(&mut self) {
-        self.data.update().unwrap();
+    pub fn update_data(&mut self) -> Result<(), (u32, String)> {
+        self.data.update()?;
+        Ok(())
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> Result<(), (u32, String)> {
         execute!(io::stdout(), terminal::Clear(ClearType::All)).unwrap();
         loop {
             let now = Instant::now();
-            self.update_data();
+            self.update_data()?;
             let elapsed = now.elapsed();
 
             io::stdout().execute(cursor::MoveTo(0, 0)).unwrap();
