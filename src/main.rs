@@ -1,8 +1,3 @@
-use crossterm::{
-    execute,
-    terminal::{self, ClearType},
-};
-use std::{io, time::{Duration, Instant}};
 use std::{thread, time};
 
 use fdm::fdm::FlightDataMonitoring;
@@ -24,34 +19,7 @@ fn main() {
 
     let mut fdm = FlightDataMonitoring::new();
 
-    loop {
-        let now = Instant::now();
-        fdm.update_data();
-        let elapsed = now.elapsed();
-
-        execute!(
-            io::stdout(),
-            terminal::Clear(ClearType::All),
-            crossterm::cursor::MoveTo(0, 0)
-        )
-        .unwrap();
-
-        println!(
-            "Latitude: {}, Longitude: {}",
-            fdm.data.position.latitude, fdm.data.position.longitude
-        );
-        println!(
-            "GS: {} knot | TAS: {} knot | IAS: {} knot",
-            fdm.data.speed.gs, fdm.data.speed.tas, fdm.data.speed.ias
-        );
-        println!(
-            "Baro: {} ft | Altitude: {} MSL | Ground: {} MSL",
-            fdm.data.baro, fdm.data.altitude, fdm.data.ground_elevation
-        );
-        println!("Elapsed: {:?}", elapsed);
-
-        thread::sleep(Duration::new(0, 8_000_000));
-    }
+    fdm.run();
 }
 
 fn get_version(fsuipc: &mut Fsuipc) -> String {
