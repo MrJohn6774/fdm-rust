@@ -19,7 +19,7 @@ fn main() {
 
     let mut fdm = FlightDataMonitoring::new();
 
-    fdm.run().expect("Failure at FDM loop");
+    fdm.run().unwrap();
 }
 
 fn get_version(fsuipc: &mut Fsuipc) -> String {

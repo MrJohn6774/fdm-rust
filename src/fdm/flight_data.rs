@@ -46,7 +46,6 @@ pub struct Speed {
 
 #[derive(Debug)]
 pub struct FlightData {
-    pub fsuipc: Rc<RefCell<Fsuipc>>,
     pub position: Position,
     pub speed: Speed,
     pub baro: f64,
@@ -57,11 +56,7 @@ pub struct FlightData {
 
 impl FlightData {
     pub fn new() -> Self {
-        let fsuipc = Rc::new(RefCell::new(Fsuipc::new()));
-        fsuipc.borrow_mut().connect().unwrap();
-
-        let flight_data = FlightData {
-            fsuipc,
+        FlightData {
             position: Position {
                 latitude: 0.0,
                 longitude: 0.0,
@@ -75,13 +70,10 @@ impl FlightData {
             altitude: 0.0,
             ground_elevation: 0.0,
             raw_data: RawData::new(),
-        };
-
-        flight_data
+        }
     }
 
-    pub fn update(&mut self) -> Result<(), (u32, String)> {
-        let fsuipc_clone = Rc::clone(&self.fsuipc);
+    pub fn update(&mut self, fsuipc_clone: Rc<RefCell<Fsuipc>>) -> Result<(), (u32, String)> {
         let mut fsuipc = fsuipc_clone.borrow_mut();
         fsuipc.read(self.raw_data.lat.0, &mut self.raw_data.lat.1)?;
         fsuipc.read(self.raw_data.lng.0, &mut self.raw_data.lng.1)?;
