@@ -93,7 +93,7 @@ impl FlightData {
         self.position.latitude.data =
             self.position.latitude.raw_data as f64 * (90.0 / (10001750.0 * 65536.0 * 65536.0));
         self.position.longitude.data =
-            self.position.latitude.raw_data as f64 * (360.0 / (65536_f64.powf(4.0)));
+            self.position.longitude.raw_data as f64 * (360.0 / (65536_f64.powf(4.0)));
         self.speed.gs.data = self.speed.gs.raw_data as f64 / 65536.0 * 1.943844; // converting m/s to knots
         self.speed.tas.data = self.speed.tas.raw_data as f64 / 128.0;
         self.speed.ias.data = self.speed.ias.raw_data as f64 / 128.0;
