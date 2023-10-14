@@ -1,7 +1,17 @@
-use std::{thread, time};
-
+use crossterm::{
+    terminal::{self, ClearType},
+    ExecutableCommand,
+};
 use fdm::fdm::FlightDataMonitoring;
 use fsuipc::Fsuipc;
+use std::{
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    thread::{self, JoinHandle},
+    time,
+};
 
 pub mod fdm;
 pub mod fsuipc;
@@ -13,13 +23,47 @@ fn main() {
 
         println!("Version: {}", get_version(&mut fsuipc));
         println!("{}", get_aircraft_name(&mut fsuipc));
+        println!("The program will continue after 2 seconds. Press 'X' to stop FDM loop")
     }
 
     thread::sleep(time::Duration::from_secs(2));
 
-    let mut fdm = FlightDataMonitoring::new();
+    let mut handles: Vec<JoinHandle<()>> = Vec::new();
+    let stop_flag = Arc::new(AtomicBool::new(false));
+    let stop_flag_fdm = stop_flag.clone();
+    let stop_flag_cli = stop_flag.clone();
 
-    fdm.run().unwrap();
+    handles.push(thread::spawn(move || {
+        let mut fdm = FlightDataMonitoring::new(stop_flag_fdm);
+        fdm.run().unwrap();
+    }));
+
+    handles.push(thread::spawn(move || {
+        let mut stdout = std::io::stdout();
+        terminal::enable_raw_mode().expect("Failed to enable raw mode");
+        stdout.execute(terminal::Clear(ClearType::All)).unwrap();
+
+        loop {
+            if let Ok(key_event) = crossterm::event::read() {
+                if let crossterm::event::Event::Key(key_event) = key_event {
+                    match key_event.code {
+                        crossterm::event::KeyCode::Char('X')
+                        | crossterm::event::KeyCode::Char('x') => {
+                            stop_flag_cli.store(true, Ordering::SeqCst);
+                            break;
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        terminal::disable_raw_mode().expect("Failed to disable raw mode");
+    }));
+
+    for handle in handles {
+        handle.join().expect("Thread panicked");
+    }
 }
 
 fn get_version(fsuipc: &mut Fsuipc) -> String {

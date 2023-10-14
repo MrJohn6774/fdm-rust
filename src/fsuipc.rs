@@ -1,10 +1,27 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(dead_code)]
 
 use std::mem::size_of;
 
 include!("../libuipc/libuipc.rs");
+
+pub type FsuipcResult<T> = Result<T, (u8, String)>;
+
+#[derive(Debug)]
+pub struct FsuipcData<ReturnDataType, FsuipcDataType> {
+    pub offset: u16,
+    pub data: ReturnDataType,
+    pub raw_data: FsuipcDataType,
+}
+
+impl<ReturnDataType, FsuipcDataType> FsuipcData<ReturnDataType, FsuipcDataType> {
+    pub fn read_raw(&mut self, fsuipc: &mut Fsuipc) -> FsuipcResult<()> {
+        fsuipc.read(self.offset, &mut self.raw_data)?;
+        Ok(())
+    }
+}
 
 #[derive(Debug)]
 #[repr(C)]
@@ -55,7 +72,7 @@ impl Fsuipc {
         }
     }
 
-    pub fn connect(&mut self) -> Result<(), (u32, String)> {
+    pub fn connect(&mut self) -> FsuipcResult<()> {
         let mut result: FSUIPC_Error = 0;
         let return_value = unsafe {
             self.ipc
@@ -67,11 +84,17 @@ impl Fsuipc {
             Ok(())
         } else {
             self.is_connected = false;
-            Err((result, self.errMsg[result as usize].to_string()))
+            Err((result as u8, self.errMsg[result as usize].to_string()))
         }
     }
 
-    pub fn read<T: Sized>(&mut self, offset: u16, value: &mut T) -> Result<(), (u32, String)> {
+    pub fn test_connection(&mut self) -> FsuipcResult<()> {
+        self.connect()?;
+        self.close();
+        Ok(())
+    }
+
+    pub fn read<T: Sized>(&mut self, offset: u16, value: &mut T) -> FsuipcResult<()> {
         let mut result: FSUIPC_Error = 0;
         // let size: DWORD = (size_of(value)).into() * 8;
         let return_value = unsafe {
@@ -87,25 +110,25 @@ impl Fsuipc {
             Ok(())
         } else {
             self.is_connected = false;
-            Err((result, self.errMsg[result as usize].to_string()))
+            Err((result as u8, self.errMsg[result as usize].to_string()))
         }
     }
 
-    pub fn process(&mut self) -> Result<(), (u32, String)> {
+    pub fn process(&mut self) -> FsuipcResult<()> {
         let mut result: FSUIPC_Error = 0;
         let return_value = unsafe { self.ipc.Process(&mut result as *mut FSUIPC_Error) };
         if return_value {
             Ok(())
         } else {
             self.is_connected = false;
-            Err((result, self.errMsg[result as usize].to_string()))
+            Err((result as u8, self.errMsg[result as usize].to_string()))
         }
     }
 
     pub fn close(&mut self) {
         if self.is_connected {
             unsafe { self.ipc.Close() };
-            println!("Closed connection");
+            println!("Closed");
             self.is_connected = false;
         }
     }
