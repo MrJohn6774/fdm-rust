@@ -15,7 +15,7 @@ pub struct FlightDataMonitoring {
     data: Arc<Mutex<FlightData>>,
     acars: Acars,
     fsuipc: Fsuipc,
-    refresh_rate: u32,
+    refresh_rate: u64,
     stop_flag: Arc<AtomicBool>,
 }
 
@@ -46,8 +46,8 @@ impl FlightDataMonitoring {
                 self.data.lock().unwrap().update(&mut self.fsuipc)?;
             }
 
-            if now.elapsed() < Duration::new(0, 999_999_900 / self.refresh_rate) {
-                thread::sleep(Duration::new(0, 1_000_000_000 / self.refresh_rate) - now.elapsed());
+            if now.elapsed() < Duration::from_millis(1000 / self.refresh_rate) {
+                thread::sleep(Duration::from_millis(1000 / self.refresh_rate) - now.elapsed());
             }
         }
         Ok(())
