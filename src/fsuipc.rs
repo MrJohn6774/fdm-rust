@@ -28,12 +28,12 @@ impl<ReturnDataType, FsuipcDataType> FsuipcData<ReturnDataType, FsuipcDataType> 
 pub struct Fsuipc {
     pub is_connected: bool,
     errMsg: [String; 16],
-    ipc: FSUIPC_IPCUser,
+    ipc: Box<FSUIPC_IPCUser>,
 }
 
 impl Fsuipc {
     pub fn new() -> Self {
-        let ipc = FSUIPC_IPCUser {
+        let ipc = Box::new(FSUIPC_IPCUser {
             Version: 0,
             FSVersion: 0,
             LibVersion: 2002,
@@ -46,7 +46,7 @@ impl Fsuipc {
             destinations: std_vector {
                 _Mypair: std::ptr::null_mut(),
             },
-        };
+        });
         Fsuipc {
             is_connected: false,
             errMsg: [
