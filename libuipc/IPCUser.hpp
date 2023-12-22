@@ -1,11 +1,13 @@
 #ifndef IPCUSER_H
 #define IPCUSER_H
 
-#include <IntSafe.h>
-#include <mutex>
 #include <vector>
 
 #ifndef _WINDEF_
+typedef unsigned long DWORD;
+typedef unsigned short WORD;
+typedef unsigned int UINT;
+typedef unsigned char BYTE;
 typedef WORD ATOM;
 typedef void *PVOID;
 typedef PVOID HANDLE;

@@ -42,9 +42,7 @@ impl Fsuipc {
             mapHandle: std::ptr::null_mut(),
             viewPointer: std::ptr::null_mut(),
             nextPointer: std::ptr::null_mut(),
-            destinations: std_vector {
-                _Mypair: std::ptr::null_mut(),
-            },
+            destinations: unsafe { std::mem::zeroed::<std_vector>() },
         });
         Fsuipc {
             is_connected: false,

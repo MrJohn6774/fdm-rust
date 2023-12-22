@@ -22,7 +22,7 @@ fn main() {
         fsuipc.test_connection().unwrap();
         println!("i {i}");
     }
-    
+
     {
         let mut fsuipc = Fsuipc::new();
         fsuipc.connect().unwrap();

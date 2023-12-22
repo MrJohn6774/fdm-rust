@@ -1,36 +1,7 @@
-pub type CHAR = ::std::os::raw::c_char;
-pub type INT8 = ::std::os::raw::c_schar;
-pub type UCHAR = ::std::os::raw::c_uchar;
-pub type UINT8 = ::std::os::raw::c_uchar;
-pub type BYTE = ::std::os::raw::c_uchar;
-pub type SHORT = ::std::os::raw::c_short;
-pub type INT16 = ::std::os::raw::c_short;
-pub type USHORT = ::std::os::raw::c_ushort;
-pub type UINT16 = ::std::os::raw::c_ushort;
-pub type WORD = ::std::os::raw::c_ushort;
-pub type INT = ::std::os::raw::c_int;
-pub type INT32 = ::std::os::raw::c_int;
-pub type UINT = ::std::os::raw::c_uint;
-pub type UINT32 = ::std::os::raw::c_uint;
-pub type LONG = ::std::os::raw::c_long;
-pub type ULONG = ::std::os::raw::c_ulong;
 pub type DWORD = ::std::os::raw::c_ulong;
-pub type LONGLONG = ::std::os::raw::c_longlong;
-pub type LONG64 = ::std::os::raw::c_longlong;
-pub type INT64 = ::std::os::raw::c_longlong;
-pub type ULONGLONG = ::std::os::raw::c_ulonglong;
-pub type DWORDLONG = ::std::os::raw::c_ulonglong;
-pub type ULONG64 = ::std::os::raw::c_ulonglong;
-pub type DWORD64 = ::std::os::raw::c_ulonglong;
-pub type UINT64 = ::std::os::raw::c_ulonglong;
-pub type INT_PTR = ::std::os::raw::c_longlong;
-pub type UINT_PTR = ::std::os::raw::c_ulonglong;
-pub type LONG_PTR = ::std::os::raw::c_longlong;
-pub type ULONG_PTR = ::std::os::raw::c_ulonglong;
-pub type DWORD_PTR = ULONG_PTR;
-pub type SSIZE_T = LONG_PTR;
-pub type SIZE_T = ULONG_PTR;
-pub type HRESULT = ::std::os::raw::c_long;
+pub type WORD = ::std::os::raw::c_ushort;
+pub type UINT = ::std::os::raw::c_uint;
+pub type BYTE = ::std::os::raw::c_uchar;
 
 pub type ATOM = WORD;
 pub type PVOID = *mut ::std::os::raw::c_void;
@@ -74,7 +45,9 @@ pub type FSUIPC_Simulator = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug)]
 pub struct std_vector {
-    pub _Mypair: *mut ::std::os::raw::c_void,
+    _dummy_1: u64,
+    _dummy_2: u64,
+    _dummy_3: u64,
 }
 
 #[repr(C)]
