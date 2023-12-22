@@ -17,15 +17,21 @@ pub mod fdm;
 pub mod fsuipc;
 
 fn main() {
+    for i in 0..5 {
+        let mut fsuipc = Fsuipc::new();
+        fsuipc.test_connection().unwrap();
+        println!("i {i}");
+    }
+    
     {
         let mut fsuipc = Fsuipc::new();
         fsuipc.connect().unwrap();
 
         println!("Version: {}", get_version(&mut fsuipc));
         println!("{}", get_aircraft_name(&mut fsuipc));
-        println!("The program will continue after 2 seconds. Press 'X' to stop FDM loop")
     }
 
+    println!("The program will continue after 2 seconds. Press 'X' to stop FDM loop");
     thread::sleep(time::Duration::from_secs(2));
 
     let mut handles: Vec<JoinHandle<()>> = Vec::new();

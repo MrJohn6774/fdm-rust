@@ -24,7 +24,6 @@ impl<ReturnDataType, FsuipcDataType> FsuipcData<ReturnDataType, FsuipcDataType> 
 }
 
 #[derive(Debug)]
-#[repr(C)]
 pub struct Fsuipc {
     pub is_connected: bool,
     errMsg: [String; 16],
