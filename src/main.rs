@@ -41,7 +41,10 @@ fn main() {
 
     handles.push(thread::spawn(move || {
         let mut fdm = FlightDataMonitoring::new(stop_flag_fdm);
-        fdm.run().unwrap();
+        if let Err((num, err_str)) = fdm.run() {
+            println!("Error {} in FDM loop: {}", num, err_str);
+        }
+        stop_flag.store(true, Ordering::SeqCst);
     }));
 
     handles.push(thread::spawn(move || {
@@ -49,7 +52,7 @@ fn main() {
         terminal::enable_raw_mode().expect("Failed to enable raw mode");
         stdout.execute(terminal::Clear(ClearType::All)).unwrap();
 
-        loop {
+        while !stop_flag_cli.load(Ordering::SeqCst) {
             if let Ok(key_event) = crossterm::event::read() {
                 if let crossterm::event::Event::Key(key_event) = key_event {
                     match key_event.code {
